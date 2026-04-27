@@ -259,3 +259,21 @@ Let me show you what this looks like written as a paper finding:
 "We observe that in 4 of 5 hallucination cases, attention to the relation token ('capital') in the final transformer block drops below 0.05 — a phenomenon we term Relation Dropout. In the single correct prediction case, relation attention remained above 0.08. This suggests that the final block's failure to maintain attention on the relation token is a reliable precursor to factual hallucination in our model."
 
 That paragraph goes in your results section. Word for word. You earned it.
+
+
+FINDING 3 — Two Types of Hallucination
+Date: 28 April 2026
+
+Type 1 — Ignorance: Model never learned the fact.
+  Signal: Relation Dropout in final block (threshold < 0.05)
+  Seen in: Our 806K toy model
+
+Type 2 — Suppression: Model knows the fact but a stronger
+  syntactic pattern overrides it. Correct answer present
+  in top-5 but not top-1.
+  Signal: Correct answer in top-5 with low probability
+  Seen in: GPT-2 124M
+
+Both produce confident wrong answers.
+Both are hallucinations.
+Different internal mechanisms.
