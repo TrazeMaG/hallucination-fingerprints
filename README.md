@@ -8,7 +8,7 @@
 
 
 
-\*\*Author:\*\* Nikhil Upadhyay (MAGWOLF)  
+\*\*Author:\*\* Nikhil Upadhyay 
 
 \*\*Status:\*\* Active Research — Week 1 of 10  
 
