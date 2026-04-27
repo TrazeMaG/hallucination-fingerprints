@@ -1,13 +1,15 @@
 import torch
 from torch.utils.data import Dataset, DataLoader
-from tokenizer import BPETokenizer
 import os
+
+try:
+    from tokenizer import BPETokenizer
+except ModuleNotFoundError:
+    from src.tokenizer import BPETokenizer
 
 class TextDataset(Dataset):
     def __init__(self, text, tokenizer, seq_len):
         self.seq_len = seq_len
-        
-        # Encode the entire text into one long list of numbers
         print("Encoding text...")
         self.tokens = tokenizer.encode(text)
         print(f"Total tokens: {len(self.tokens):,}")
@@ -15,19 +17,11 @@ class TextDataset(Dataset):
         print(f"Total training examples: {len(self):,}")
 
     def __len__(self):
-        # How many training examples can we make?
-        # Each example is seq_len tokens
-        # We need one extra token for the target
         return len(self.tokens) - self.seq_len - 1
 
     def __getitem__(self, idx):
-        # Input: tokens at positions idx to idx+seq_len
-        # Target: tokens at positions idx+1 to idx+seq_len+1
-        # (shifted by one — the model predicts the next token)
-        
         input_tokens = self.tokens[idx : idx + self.seq_len]
         target_tokens = self.tokens[idx+1 : idx + self.seq_len + 1]
-        
         return (
             torch.tensor(input_tokens, dtype=torch.long),
             torch.tensor(target_tokens, dtype=torch.long)
@@ -35,36 +29,23 @@ class TextDataset(Dataset):
 
 
 def prepare_data(text, vocab_size=1000, seq_len=32, batch_size=16):
-    """Full pipeline: text → tokenizer → dataset → dataloader"""
-    
-    # Train tokenizer
     tokenizer = BPETokenizer(vocab_size=vocab_size)
     tokenizer.train(text)
     tokenizer.build_vocab(text)
-    
-    # Create dataset
     dataset = TextDataset(text, tokenizer, seq_len)
-    
-    # Create dataloader — shuffles and batches automatically
     dataloader = DataLoader(
         dataset,
         batch_size=batch_size,
         shuffle=True,
         drop_last=True
     )
-    
     print(f"\nDataloader ready")
     print(f"Batches per epoch: {len(dataloader)}")
-    print(f"Each batch: input {batch_size}×{seq_len}, "
-          f"target {batch_size}×{seq_len}")
-    
+    print(f"Each batch: input {batch_size}x{seq_len}, target {batch_size}x{seq_len}")
     return tokenizer, dataloader
 
 
-# ─── TEST IT ─────────────────────────────────────────────────────
-
 if __name__ == "__main__":
-    # Sample text — we'll replace this with Wikipedia later
     text = """
     the capital of france is paris the capital of germany is berlin
     the capital of italy is rome the capital of spain is madrid
@@ -80,24 +61,11 @@ if __name__ == "__main__":
     the colosseum is in rome the sagrada familia is in barcelona
     tokyo is the capital of japan beijing is the capital of china
     the emperor of japan lives in tokyo the president of china is in beijing
-    """ * 50  # repeat to get more training data
+    """ * 50
 
-    tokenizer, dataloader = prepare_data(
-        text,
-        vocab_size=500,
-        seq_len=32,
-        batch_size=4
-    )
-
-    # Look at one batch
-    print("\n─── Sample Batch ───")
+    tokenizer, dataloader = prepare_data(text, vocab_size=500, seq_len=32, batch_size=4)
     inputs, targets = next(iter(dataloader))
-    print(f"Input shape:  {inputs.shape}")
+    print(f"\nInput shape:  {inputs.shape}")
     print(f"Target shape: {targets.shape}")
-    print(f"\nFirst example:")
-    print(f"Input tokens:  {inputs[0].tolist()}")
-    print(f"Target tokens: {targets[0].tolist()}")
-    print(f"\nDecoded input:  '{tokenizer.decode(inputs[0].tolist())}'")
+    print(f"Decoded input:  '{tokenizer.decode(inputs[0].tolist())}'")
     print(f"Decoded target: '{tokenizer.decode(targets[0].tolist())}'")
-    print(f"\nNotice: target is input shifted by one position")
-    print(f"Model learns: given these tokens, predict the next one")

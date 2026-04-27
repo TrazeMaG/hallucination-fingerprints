@@ -4,23 +4,24 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from transformer import Hallucinations_Transformer
-from data import prepare_data
+try:
+    from transformer import Hallucinations_Transformer
+    from data import prepare_data
+except ModuleNotFoundError:
+    from src.transformer import Hallucinations_Transformer
+    from src.data import prepare_data
 
 # ─── SETTINGS ────────────────────────────────────────────────────
 
-# Model settings
-VOCAB_SIZE   = 500
-D_MODEL      = 128    # smaller = faster training
-NUM_HEADS    = 4
-NUM_BLOCKS   = 4
-MAX_SEQ_LEN  = 64
-
-# Training settings
-SEQ_LEN      = 32
-BATCH_SIZE   = 8
-EPOCHS       = 10
-LEARNING_RATE = 3e-4  # 0.0003 — the most common LR for transformers
+VOCAB_SIZE    = 500
+D_MODEL       = 128
+NUM_HEADS     = 4
+NUM_BLOCKS    = 4
+MAX_SEQ_LEN   = 64
+SEQ_LEN       = 32
+BATCH_SIZE    = 8
+EPOCHS        = 10
+LEARNING_RATE = 3e-4
 
 # ─── DATA ────────────────────────────────────────────────────────
 
@@ -47,7 +48,6 @@ print("=" * 50)
 print("HALLUCINATION FINGERPRINTS — TRAINING RUN")
 print("=" * 50)
 
-# Prepare data
 tokenizer, dataloader = prepare_data(
     text,
     vocab_size=VOCAB_SIZE,
@@ -55,7 +55,6 @@ tokenizer, dataloader = prepare_data(
     batch_size=BATCH_SIZE
 )
 
-# Build model
 model = Hallucinations_Transformer(
     vocab_size=len(tokenizer.vocab),
     d_model=D_MODEL,
@@ -67,12 +66,7 @@ model = Hallucinations_Transformer(
 total_params = sum(p.numel() for p in model.parameters())
 print(f"\nModel parameters: {total_params:,}")
 
-# Loss function — measures how wrong the prediction is
-# CrossEntropyLoss is standard for next token prediction
 loss_fn = nn.CrossEntropyLoss()
-
-# Optimiser — the thing that nudges parameters after each mistake
-# Adam is the most common optimiser — handles learning rate automatically
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
 # ─── TRAINING LOOP ───────────────────────────────────────────────
@@ -86,60 +80,31 @@ for epoch in range(EPOCHS):
     num_batches = 0
 
     for batch_idx, (inputs, targets) in enumerate(dataloader):
-        # inputs:  [batch_size, seq_len] — the question
-        # targets: [batch_size, seq_len] — the correct answer
-
-        # ── Forward pass ──
-        # Run inputs through the model
         logits, _ = model(inputs)
-        # logits shape: [batch_size, seq_len, vocab_size]
-
-        # ── Calculate loss ──
-        # Reshape for loss function
-        # logits:  [batch_size × seq_len, vocab_size]
-        # targets: [batch_size × seq_len]
         loss = loss_fn(
             logits.view(-1, len(tokenizer.vocab)),
             targets.view(-1)
         )
-
-        # ── Backward pass ──
-        # Zero out old gradients first
         optimizer.zero_grad()
-
-        # Calculate gradients — which parameters caused the mistake?
         loss.backward()
-
-        # Clip gradients — prevents them exploding to huge numbers
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-
-        # Nudge parameters in the right direction
         optimizer.step()
-
         total_loss += loss.item()
         num_batches += 1
 
-    # Average loss for this epoch
     avg_loss = total_loss / num_batches
 
-    # ── Test what the model predicts ──
     model.eval()
     with torch.no_grad():
         test_input = "the capital of france is"
         encoded = tokenizer.encode(test_input)
         encoded = encoded[:SEQ_LEN]
-        # Pad if needed
         padded = encoded + [0] * (SEQ_LEN - len(encoded))
         input_tensor = torch.tensor([padded])
-
         logits, _ = model(input_tensor)
-
-        # Get prediction for the last real token
         last_pos = len(encoded) - 1
-        next_token_logits = logits[0, last_pos, :]
-        predicted_idx = next_token_logits.argmax().item()
+        predicted_idx = logits[0, last_pos, :].argmax().item()
         predicted_token = tokenizer.idx_to_token.get(predicted_idx, '?')
-
     model.train()
 
     print(f"Epoch {epoch+1:2d}/{EPOCHS} | "
@@ -148,10 +113,8 @@ for epoch in range(EPOCHS):
 
 print("-" * 50)
 print("Training complete!")
-print("\nIf loss went down and the model predicts 'paris'")
-print("or something close — it is learning.")
 
-# Save the model
+os.makedirs('checkpoints', exist_ok=True)
 torch.save({
     'model_state': model.state_dict(),
     'tokenizer_merges': tokenizer.merges,
