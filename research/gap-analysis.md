@@ -277,3 +277,22 @@ Type 2 — Suppression: Model knows the fact but a stronger
 Both produce confident wrong answers.
 Both are hallucinations.
 Different internal mechanisms.
+
+FINDING 4 — Last-Layer Suppression
+Date: 28 April 2026
+
+In GPT-2:
+- Blocks 1-9:  structural pattern dominates, factual prob ~0
+- Blocks 10-11: factual knowledge EMERGES with high probability
+                Paris: 18%, Berlin: 35%, Tokyo: 46%
+- Block 12:    final layer SUPPRESSES factual signal
+                all correct answers collapse to ~0.0002
+
+Facts that survive (Berlin Wall 1989):
+  Factual signal strong enough to resist Block 12 suppression
+
+Facts that don't survive (Paris, Berlin, Tokyo):
+  Factual signal present in blocks 10-11 but too weak
+  to overcome Block 12 structural interference
+
+Named: LAST-LAYER SUPPRESSION
