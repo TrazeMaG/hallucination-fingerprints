@@ -84,6 +84,18 @@ The single correct prediction maintained relation attention above 0.08.
 
 \---
 
+## GPT-2 Validation (Week 2)
+
+Tested same prompts on GPT-2 (124M parameters). Found three 
+distinct hallucination types:
+
+| Type | Description | Signal | Example |
+|------|-------------|--------|---------|
+| Type 1 — Ignorance | Fact not learned | Relation Dropout < 0.05 | Our 806K model |
+| Type 2a — Suppression | Fact known but overridden | Correct in top-5, rank 2-5 | GPT-2 on France, Germany |
+| Type 2b — Knowledge gap | Fact not in training data | Correct not in top-5 | GPT-2 on Brazil, Australia |
+
+All three produce confident wrong answers. Different internal mechanisms.
 
 
 \## Project Structure
