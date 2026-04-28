@@ -1,0 +1,12 @@
+LICENSE
+README.md
+pyproject.toml
+setup.py
+hallscan/__init__.py
+hallscan/report.py
+hallscan/scanner.py
+hallscan.egg-info/PKG-INFO
+hallscan.egg-info/SOURCES.txt
+hallscan.egg-info/dependency_links.txt
+hallscan.egg-info/requires.txt
+hallscan.egg-info/top_level.txt

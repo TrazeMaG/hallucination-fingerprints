@@ -1,0 +1,28 @@
+Metadata-Version: 2.4
+Name: hallscan
+Version: 0.1.0
+Summary: Hallucination detection for language models using internal activation analysis
+Home-page: https://github.com/TrazeMaG/hallucination-fingerprints
+Author: Nikhil Upadhyay
+Author-email: nikhil25000@gmail.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: torch>=2.0.0
+Requires-Dist: transformers>=4.0.0
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+HallScan detects hallucination patterns in language models by analyzing internal attention maps and hidden states. Based on the paper: Hallucination Fingerprints (Upadhyay, 2026).
