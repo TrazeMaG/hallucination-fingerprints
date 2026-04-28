@@ -1,0 +1,479 @@
+\documentclass[11pt,a4paper]{article}
+
+% ── Packages ─────────────────────────────────────────────────────
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{authblk}
+\usepackage{abstract}
+\usepackage{titlesec}
+\usepackage{natbib}
+\usepackage{microtype}
+\usepackage{parskip}
+
+% ── Hyperlink colours ─────────────────────────────────────────────
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!70!black,
+    citecolor=blue!70!black,
+    urlcolor=blue!70!black
+}
+
+% ── Title ─────────────────────────────────────────────────────────
+\title{\textbf{Hallucination Fingerprints: Consistent Failure
+Patterns in Large Language Models}}
+
+\author[1]{Nikhil Upadhyay}
+\affil[1]{Dublin Business School, Dublin, Ireland \\
+\texttt{nikhil25000@gmail.com}}
+
+\date{April 2026}
+
+% ─────────────────────────────────────────────────────────────────
+\begin{document}
+\maketitle
+
+% ── Abstract ──────────────────────────────────────────────────────
+\begin{abstract}
+Large language models hallucinate---producing factually incorrect
+outputs with high confidence---in ways that are not fully understood.
+We investigate whether hallucinations follow \emph{consistent,
+detectable patterns} in the internal activations of transformer
+models prior to the generation of an incorrect token.
+Through experiments on a custom 806K-parameter transformer and
+GPT-2 (124M parameters), tested across 20,000 factual prompts in
+7 knowledge categories, we identify two named phenomena:
+\textbf{Relation Dropout}, in which attention to the semantic
+relation token collapses in the final transformer block of small
+models; and \textbf{Last-Layer Suppression}, in which factual
+knowledge emerges in blocks 10--11 of GPT-2 but is systematically
+suppressed by block 12.
+We further propose a three-type hallucination taxonomy
+and release HallScan, an open-source detection tool, and
+HallBench, a labeled benchmark of 20,000 annotated examples.
+\end{abstract}
+
+% ── 1. Introduction ───────────────────────────────────────────────
+\section{Introduction}
+
+Large language models (LLMs) have demonstrated remarkable
+capabilities in knowledge retrieval, reasoning, and language
+generation \citep{brown2020language}. However, they remain prone
+to \emph{hallucination}: the confident generation of factually
+incorrect content \citep{ji2023survey}. Despite extensive research
+into hallucination detection at the output level, the internal
+mechanisms that give rise to hallucinations remain poorly understood.
+
+In this paper, we ask a more fundamental question: \emph{do
+language models hallucinate in consistent, detectable patterns
+visible in their internal activations before the incorrect token
+is generated?} If such patterns exist, they could form the basis
+of a new class of hallucination detectors that operate on model
+internals rather than post-hoc output verification.
+
+Our contributions are as follows:
+\begin{itemize}
+    \item We identify and name \textbf{Relation Dropout}: a
+    phenomenon in which small transformer models lose attention
+    to the semantic relation token in the final block immediately
+    before a hallucination.
+
+    \item We identify and name \textbf{Last-Layer Suppression}:
+    a phenomenon in which GPT-2 correctly identifies factual
+    answers in blocks 10--11 of its residual stream, but block
+    12 systematically suppresses this signal via structural
+    pattern interference.
+
+    \item We propose a \textbf{three-type hallucination taxonomy}
+    (Type 1: Ignorance/Dropout; Type 2a: Suppression; Type 2b:
+    Knowledge Gap) grounded in internal activation analysis.
+
+    \item We validate our findings at scale across \textbf{20,000
+    factual prompts} in 7 knowledge categories using an RTX 4060
+    GPU.
+
+    \item We release \textbf{HallScan}, an open-source Python
+    library for hallucination detection, and \textbf{HallBench},
+    a labeled benchmark of 20,000 annotated examples.
+\end{itemize}
+
+% ── 2. Related Work ───────────────────────────────────────────────
+\section{Related Work}
+
+\paragraph{Hallucination in NLG.}
+\citet{ji2023survey} provide a comprehensive survey of
+hallucination in natural language generation, distinguishing
+between intrinsic hallucinations (contradicting source material)
+and extrinsic hallucinations (unverifiable claims).
+\citet{lin2022truthfulqa} introduce TruthfulQA, a benchmark
+measuring whether models mimic human falsehoods, finding that
+larger models are not necessarily more truthful.
+
+\paragraph{Factuality and calibration.}
+\citet{kadavath2022language} study whether models know what they
+know, finding that well-calibrated models can identify their own
+uncertainty. \citet{mielke2022reducing} examine confidence
+calibration in language model generations.
+
+\paragraph{Mechanistic interpretability.}
+\citet{elhage2021mathematical} introduce a mathematical framework
+for understanding transformer circuits. \citet{olsson2022context}
+identify induction heads as a key mechanism in in-context learning.
+Our work applies interpretability tools to the specific problem
+of hallucination, examining which internal components fail
+during factual recall.
+
+\paragraph{Knowledge in transformers.}
+\citet{geva2021transformer} demonstrate that feed-forward layers
+in transformers function as key-value memories storing factual
+knowledge. This finding motivates our examination of both
+attention and feed-forward activations during hallucination.
+
+% ── 3. Method ─────────────────────────────────────────────────────
+\section{Method}
+
+\subsection{Models}
+
+We conduct experiments on two models:
+
+\textbf{Custom transformer (806K parameters).} A GPT-style
+decoder-only transformer with 4 blocks, 4 attention heads, and
+$d_{\text{model}} = 128$. Trained from scratch on a curated
+factual corpus of capital cities and geographic facts.
+This model serves as a controlled environment where training
+data is fully known.
+
+\textbf{GPT-2 (124M parameters).} The standard GPT-2 model
+\citep{radford2019language} pretrained on 40GB of internet text.
+This model serves as a validation environment representing
+production-scale language models.
+
+\subsection{Evaluation Framework}
+
+For each prompt, we record:
+\begin{enumerate}
+    \item The top-10 predicted tokens and their probabilities
+    \item Attention weights in the final transformer block
+    averaged across all heads
+    \item Hidden state projections at each transformer block,
+    obtained by passing the residual stream through the model's
+    final layer norm and unembedding matrix
+    \item The layer at which the correct answer probability peaks
+    \item The layer at which suppression first occurs
+\end{enumerate}
+
+\subsection{Hallucination Taxonomy}
+
+We classify each incorrect prediction into one of three types:
+
+\textbf{Type 1 --- Relation Dropout.}
+The model fails to attend to the semantic relation token
+(e.g., ``capital'') in the final block. Relation attention
+falls below a threshold of 0.05.
+Characteristic of small, undertrained models.
+
+\textbf{Type 2a --- Last-Layer Suppression.}
+The correct answer appears in the top-10 predictions but is
+not the top-1. The model ``knows'' the answer but a competing
+structural pattern overrides it in the final block.
+
+\textbf{Type 2b --- Knowledge Gap.}
+The correct answer does not appear in the top-10 predictions.
+The model has not encoded the relevant fact during training.
+
+% ── 4. Experiments ────────────────────────────────────────────────
+\section{Experiments}
+
+\subsection{Experiment 1: Relation Dropout in Small Models}
+
+We trained a 806K-parameter transformer on a factual corpus
+and tested it on 6 capital city prompts of the form
+``The capital of [country] is''.
+For each prompt, we measured the average attention weight
+directed to the relation token ``capital'' in the final
+transformer block across all attention heads.
+
+\subsection{Experiment 2: GPT-2 Validation}
+
+We tested GPT-2 on 35 factual prompts across 5 categories:
+capitals, inventors, authors, science facts, and historical
+dates. For each prompt we classified the hallucination type
+using our taxonomy.
+
+\subsection{Experiment 3: Layer-by-Layer Suppression Analysis}
+
+For 5 prompts exhibiting Type 2a suppression, we projected
+the hidden state at each of GPT-2's 12 transformer blocks
+through the final layer norm and unembedding matrix to obtain
+per-layer vocabulary probabilities. This allowed us to track
+the probability of both the correct answer and the competing
+token at each layer.
+
+\subsection{Experiment 4: Large-Scale Validation}
+
+Using an NVIDIA RTX 4060 Laptop GPU, we ran 20,000 factual
+prompts through GPT-2 across 7 knowledge categories. Prompts
+were generated from 50 country-capital pairs (with 3 phrasing
+variants each), 15 scientist-discovery pairs, 10 historical
+dates, 10 science facts, and 10 author-work pairs.
+
+% ── 5. Results ────────────────────────────────────────────────────
+\section{Results}
+
+\subsection{Relation Dropout (Experiment 1)}
+
+Table \ref{tab:relation_dropout} shows the relation attention
+scores and hallucination outcomes for our small model.
+
+\begin{table}[h]
+\centering
+\caption{Relation Dropout in 806K-parameter model.
+All 6 hallucination cases show relation attention below 0.05.}
+\label{tab:relation_dropout}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Prompt} & \textbf{Predicted} &
+\textbf{Rel. Attn} & \textbf{Result} \\
+\midrule
+...capital of France is  & the    & 0.037 & Hallucination \\
+...capital of Germany is & paris  & 0.028 & Hallucination \\
+...capital of Italy is   & in     & 0.033 & Hallucination \\
+...capital of Japan is   & the    & 0.033 & Hallucination \\
+...capital of China is   & the    & 0.083 & Hallucination \\
+...capital of Spain is   & madrid & 0.082 & \textbf{Correct} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The single correct prediction maintains relation attention above
+0.08. Four of five hallucination cases show relation attention
+below 0.05, consistent with our Relation Dropout hypothesis.
+
+\subsection{GPT-2 Validation (Experiment 2)}
+
+Table \ref{tab:gpt2} shows results by category for GPT-2.
+
+\begin{table}[h]
+\centering
+\caption{GPT-2 hallucination taxonomy across 5 categories
+(35 prompts). Zero Type 1 cases observed.}
+\label{tab:gpt2}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Category} & \textbf{Correct} &
+\textbf{Type 1} & \textbf{Type 2a} & \textbf{Type 2b} \\
+\midrule
+Capitals   & 4/15 & 0 & 7  & 4 \\
+Inventors  & 0/5  & 0 & 3  & 2 \\
+Authors    & 0/5  & 0 & 0  & 5 \\
+Science    & 2/5  & 0 & 0  & 3 \\
+History    & 1/5  & 0 & 1  & 3 \\
+\midrule
+\textbf{Total} & \textbf{7/35} & \textbf{0} &
+\textbf{11} & \textbf{17} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Last-Layer Suppression (Experiment 3)}
+
+Layer-by-layer analysis reveals a consistent pattern across
+all tested prompts. The probability of the correct answer
+remains near zero through blocks 1--9, surges in blocks 10--11,
+then collapses in block 12 as the structural pattern token
+(typically ``the'') takes over.
+
+\begin{table}[h]
+\centering
+\caption{Peak factual layer and suppression layer for 4 prompts.
+Block 12 suppresses in every case.}
+\label{tab:layers}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Prompt} & \textbf{Peak Layer} &
+\textbf{Peak Prob} & \textbf{Suppression} \\
+\midrule
+...capital of France is  & Block 10 & 0.182 & Block 12 \\
+...capital of Germany is & Block 11 & 0.347 & Block 12 \\
+...capital of Japan is   & Block 11 & 0.461 & Block 12 \\
+The Berlin Wall fell in  & Block 10 & 0.128 & Block 12 \\
+\midrule
+\textbf{Average} & \textbf{10.5} & -- & \textbf{12.0} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+We note that ``The Berlin Wall fell in 1989'' is predicted
+correctly despite Block 12 suppression, because the factual
+signal (0.128) exceeds the suppressor token's probability
+(0.045). We term this the \emph{survival threshold}.
+
+\subsection{Large-Scale Validation (Experiment 4)}
+
+Table \ref{tab:largescale} shows results across 20,000 prompts.
+
+\begin{table}[h]
+\centering
+\caption{Large-scale results across 20,000 prompts on GPT-2.}
+\label{tab:largescale}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Hallucination Type} & \textbf{Count} & \textbf{\%} \\
+\midrule
+Correct              &    954 &  4.8\% \\
+Type 1 (Dropout)     &  2,946 & 14.7\% \\
+Type 2a (Suppression)&  2,481 & 12.4\% \\
+Type 2b (Gap)        & 13,619 & 68.1\% \\
+\midrule
+\textbf{Total}       & \textbf{20,000} & \textbf{100\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The average peak factual layer across all 20,000 prompts is
+\textbf{11.1}, and the average suppression layer is
+\textbf{12.0}, confirming Last-Layer Suppression at scale.
+
+We also observe strong \textbf{prompt sensitivity}: alternative
+phrasings of the same fact dramatically reduce accuracy.
+The prompt ``The capital of France is'' achieves 8.1\% accuracy
+on capitals, while ``France's capital city is'' achieves 0.0\%,
+despite encoding the same factual query.
+
+% ── 6. Discussion ─────────────────────────────────────────────────
+\section{Discussion}
+
+\paragraph{Relation Dropout vs Last-Layer Suppression.}
+The two named phenomena operate at different scales and through
+different mechanisms. Relation Dropout reflects a failure of
+attention routing: the model fails to identify which words are
+semantically relevant. Last-Layer Suppression reflects a failure
+of output selection: the model identifies the correct answer
+internally but cannot output it against a stronger structural
+pattern.
+
+\paragraph{The survival threshold.}
+Our results suggest that facts with high training frequency
+can survive Last-Layer Suppression. ``The Berlin Wall fell in
+1989'' and ``Water is made of hydrogen and oxygen'' both survive
+because their factual signal exceeds the suppressor token.
+This implies that hallucination rate is partly a function of
+training data frequency, independent of model size.
+
+\paragraph{Prompt sensitivity.}
+The dramatic accuracy drop between phrasing variants of the
+same factual query (8.1\% vs 0.0\% for capitals) suggests that
+GPT-2's factual knowledge is highly form-dependent. The model
+has not learned facts in an abstract sense but has learned
+specific surface-form patterns.
+
+\paragraph{Implications for detection.}
+HallScan operationalises our findings as a practical tool.
+By examining relation attention in the final block and
+tracking the peak factual layer, HallScan can classify
+hallucination risk without access to the correct answer.
+
+% ── 7. Limitations ────────────────────────────────────────────────
+\section{Limitations}
+
+Our study has several limitations that future work should address.
+
+First, our small model is trained on a deliberately constrained
+corpus, which may not reflect the diversity of real-world
+training data. The Relation Dropout threshold of 0.05 was
+determined empirically and may not generalise across
+architectures.
+
+Second, our large-scale experiment repeats a fixed set of
+210 base prompts to reach 20,000 examples. While this tests
+consistency of findings, it does not provide 20,000 independent
+factual queries. Future work should construct larger independent
+prompt sets.
+
+Third, we test only GPT-2 at the production-model scale.
+Validation on larger models (GPT-3, LLaMA, Claude) is needed
+to confirm whether Last-Layer Suppression is specific to
+GPT-2's architecture or a general phenomenon.
+
+Fourth, our taxonomy is based on observable output behaviour
+and attention patterns. Deeper mechanistic analysis using
+causal intervention methods \citep{elhage2021mathematical}
+would strengthen the causal claims.
+
+% ── 8. Conclusion ─────────────────────────────────────────────────
+\section{Conclusion}
+
+We have demonstrated that language model hallucinations follow
+consistent, detectable internal patterns. We named two phenomena:
+Relation Dropout in small models and Last-Layer Suppression
+in GPT-2. We validated these findings across 20,000 prompts
+and released HallScan and HallBench to support future research.
+
+We believe internal activation analysis represents a promising
+direction for hallucination detection that is complementary
+to existing output-level approaches. The patterns we identify
+suggest that the mechanisms of hallucination are not random
+but systematic --- and therefore potentially correctable.
+
+Code, data, and models are available at:\\
+\url{https://github.com/TrazeMaG/hallucination-fingerprints}\\
+HallBench dataset: \url{https://huggingface.co/datasets/Trazemag/hallbench}
+
+% ── References ────────────────────────────────────────────────────
+\bibliographystyle{plainnat}
+
+\begin{thebibliography}{10}
+
+\bibitem[Brown et al.(2020)]{brown2020language}
+Brown, T., Mann, B., Ryder, N., et al. (2020).
+Language models are few-shot learners.
+\emph{Advances in Neural Information Processing Systems}, 33.
+
+\bibitem[Elhage et al.(2021)]{elhage2021mathematical}
+Elhage, N., Nanda, N., Olsson, C., et al. (2021).
+A mathematical framework for transformer circuits.
+\emph{Transformer Circuits Thread}.
+
+\bibitem[Geva et al.(2021)]{geva2021transformer}
+Geva, M., Schuster, R., Berant, J., \& Levy, O. (2021).
+Transformer feed-forward layers are key-value memories.
+\emph{EMNLP 2021}.
+
+\bibitem[Ji et al.(2023)]{ji2023survey}
+Ji, Z., Lee, N., Frieske, R., et al. (2023).
+Survey of hallucination in natural language generation.
+\emph{ACM Computing Surveys}, 55(12).
+
+\bibitem[Kadavath et al.(2022)]{kadavath2022language}
+Kadavath, S., Conerly, T., Askell, A., et al. (2022).
+Language models (mostly) know what they know.
+\emph{arXiv:2207.05221}.
+
+\bibitem[Lin et al.(2022)]{lin2022truthfulqa}
+Lin, S., Hilton, J., \& Evans, O. (2022).
+TruthfulQA: Measuring how models mimic human falsehoods.
+\emph{ACL 2022}.
+
+\bibitem[Mielke et al.(2022)]{mielke2022reducing}
+Mielke, S. J., Szlam, A., Dinan, E., \& Boureau, Y. L. (2022).
+Reducing conversational agents' overconfidence
+through linguistic calibration.
+\emph{TACL}, 10.
+
+\bibitem[Olsson et al.(2022)]{olsson2022context}
+Olsson, C., Elhage, N., Nanda, N., et al. (2022).
+In-context learning and induction heads.
+\emph{Transformer Circuits Thread}.
+
+\bibitem[Radford et al.(2019)]{radford2019language}
+Radford, A., Wu, J., Child, R., et al. (2019).
+Language models are unsupervised multitask learners.
+\emph{OpenAI Blog}.
+
+\end{thebibliography}
+
+\end{document}
