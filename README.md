@@ -1,5 +1,4 @@
-Here's the full updated README first:
-markdown# Hallucination Fingerprints
+Hallucination Fingerprints
 
 > Identifying consistent internal activation patterns that precede
 > hallucinations in transformer language models.
