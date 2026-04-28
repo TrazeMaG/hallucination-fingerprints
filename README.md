@@ -5,7 +5,7 @@ markdown# Hallucination Fingerprints
 > hallucinations in transformer language models.
 
 **Author:** Nikhil Upadhyay  
-**Institution:** Dublin Business School, Dublin, Ireland  
+**Institution:** Independent Researcher, Dublin, Ireland
 **Status:** Paper complete — arXiv submission pending  
 **Paper:** `paper/hallucination_fingerprints.pdf`
 
