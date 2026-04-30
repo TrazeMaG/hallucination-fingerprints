@@ -1,5 +1,6 @@
 \documentclass[11pt,a4paper]{article}
 
+% ── Packages ─────────────────────────────────────────────────────
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
@@ -41,15 +42,16 @@ Germany is Paris, something has gone wrong inside the model
 before that word ever appears. This paper investigates what.
 We ask whether hallucinations follow \emph{consistent, detectable
 patterns} in the internal activations of transformer models
-prior to the generation of an incorrect token --- and find
+prior to the generation of an incorrect token, and find
 that they do. Through experiments on a custom 806K-parameter
 transformer and GPT-2 (124M parameters), tested across 20,000
 factual prompts in 7 knowledge categories, we identify two named
-phenomena: \textbf{Relation Dropout}, in which attention to the
-semantic relation token collapses in the final transformer block
-of small models; and \textbf{Last-Layer Suppression}, in which
-factual knowledge emerges correctly in blocks 10--11 of GPT-2
-but is systematically overridden by block 12.
+phenomena. \textbf{Relation Dropout}: attention to the semantic
+relation token collapses in the final transformer block of small
+models before a hallucination occurs.
+\textbf{Last-Layer Suppression}: factual knowledge emerges
+correctly in blocks 10--11 of GPT-2 but is systematically
+overridden by block 12.
 We propose a three-type hallucination taxonomy, release
 \textbf{HallScan} (\texttt{pip install hallscan}), an
 open-source detection tool, and \textbf{HallBench}, a labeled
@@ -70,7 +72,7 @@ The model is wrong. But more striking than the error is the
 confidence. GPT-2 does not hedge. It does not say ``I think.''
 It predicts ``the'' as though Berlin were never a possibility.
 
-Yet Berlin \emph{was} a possibility --- inside the model.
+Yet Berlin \emph{was} a possibility inside the model.
 Our layer-by-layer analysis reveals that at block 11,
 the probability of ``Berlin'' reaches 34.7\%. The model
 has found the answer. Then block 12 erases it, and ``the''
@@ -81,19 +83,18 @@ This paper is about that forgetting. Specifically, we ask:
 patterns visible in their internal activations before the
 incorrect token is generated?}
 
-If such patterns exist --- and we show that they do --- they
-could form the basis of a new class of hallucination detectors
-that intercept errors during generation rather than catching
-them post-hoc.
+We show that such patterns exist. They form the basis of a
+new class of hallucination detectors that intercept errors
+during generation rather than catching them post-hoc.
 
 \paragraph{Contributions.} We make the following contributions:
 
 \begin{itemize}
-    \item We identify and name \textbf{Relation Dropout}:
-    in small transformer models, attention to the semantic
-    relation token (e.g., ``capital'') collapses in the final
-    block immediately before a hallucination, even when the
-    entity token (e.g., ``germany'') is strongly attended to.
+    \item We identify and name \textbf{Relation Dropout}: in
+    small transformer models, attention to the semantic relation
+    token (e.g., ``capital'') collapses in the final block
+    immediately before a hallucination. This occurs even when
+    the entity token (e.g., ``germany'') is strongly attended to.
 
     \item We identify and name \textbf{Last-Layer Suppression}:
     in GPT-2, factual knowledge emerges with high probability
@@ -103,8 +104,8 @@ them post-hoc.
     with an average suppression layer of exactly 12.0.
 
     \item We propose a \textbf{three-type hallucination taxonomy}
-    (Type 1: Relation Dropout; Type 2a: Last-Layer Suppression;
-    Type 2b: Knowledge Gap) grounded in internal activation
+    (Type~1: Relation Dropout; Type~2a: Last-Layer Suppression;
+    Type~2b: Knowledge Gap) grounded in internal activation
     analysis rather than output-level evaluation.
 
     \item We discover \textbf{prompt sensitivity} as a
@@ -133,7 +134,7 @@ hallucination in natural language generation, distinguishing
 intrinsic errors (contradicting source material) from extrinsic
 ones (unverifiable claims). \citet{lin2022truthfulqa} introduce
 TruthfulQA, demonstrating that larger models are not necessarily
-more truthful --- a counterintuitive finding that motivates our
+more truthful. This counterintuitive finding motivates our
 investigation of internal mechanisms rather than scale.
 
 \paragraph{Factuality and calibration.}
@@ -165,18 +166,19 @@ suppressed by a final output-selection mechanism.
 
 \subsection{Models}
 
-\textbf{Custom transformer (806K parameters).}
+\paragraph{Custom transformer (806K parameters).}
 We train a GPT-style decoder-only transformer with 4 blocks,
 4 attention heads, and $d_{\text{model}} = 128$ on a curated
 corpus of factual capital-city and geographic statements
 (e.g., ``the capital of france is paris''), repeated to produce
 8,350 training tokens. We train for 10 epochs using the Adam
-optimiser with learning rate $3 \times 10^{-4}$ and observe
-loss converging to near zero --- demonstrating overfitting to
-the training distribution, which allows us to study
-hallucination in a fully controlled environment.
+optimiser \citep{kingma2014adam} with learning rate
+$3 \times 10^{-4}$ and observe loss converging to near zero,
+demonstrating overfitting to the training distribution.
+This controlled environment allows us to study hallucination
+in a setting where training data is fully known.
 
-\textbf{GPT-2 (124M parameters).}
+\paragraph{GPT-2 (124M parameters).}
 We use the standard GPT-2 model \citep{radford2019language}
 pretrained on 40GB of internet text (WebText). This model
 serves as our production-scale validation environment,
@@ -185,42 +187,43 @@ deployed in practice.
 
 \subsection{Internal Activation Capture}
 
-For each prompt, we capture:
+For each prompt, we record:
 \begin{enumerate}
     \item \textbf{Attention weights} in every block averaged
     across all heads, with particular focus on attention
     directed to the relation token.
 
     \item \textbf{Hidden state projections} at each block,
-    obtained by passing the residual stream through the model's
-    final layer norm and unembedding matrix. This allows us to
-    compute the implied vocabulary distribution at each
-    intermediate layer --- revealing what the model ``would
-    predict'' if generation stopped at that block.
+    obtained by passing the residual stream through the
+    model's final layer norm and unembedding matrix. This
+    allows us to compute the implied vocabulary distribution
+    at each intermediate layer, revealing what the model
+    ``would predict'' if generation stopped at that block.
 
     \item \textbf{Top-10 predictions} and their probabilities
     at the final output layer.
 \end{enumerate}
 
 \subsection{Hallucination Taxonomy}
+\label{sec:taxonomy}
 
 We classify each incorrect prediction into one of three types:
 
-\textbf{Type 1 --- Relation Dropout.}
+\paragraph{Type~1: Relation Dropout.}
 Average attention to the relation token in the final block
 falls below $\tau = 0.05$. The model fails to route attention
 to the semantically critical word that constrains the answer
-type. Characteristic of small, undertrained models.
+type. This type is characteristic of small, undertrained models.
 
-\textbf{Type 2a --- Last-Layer Suppression.}
+\paragraph{Type~2a: Last-Layer Suppression.}
 The correct answer appears in the top-10 predictions at the
-final output layer but is not the top-1. Internal layer
-analysis reveals the correct answer peaked in blocks 10--11
-before being suppressed by block 12.
+final output layer but is not the top-1 prediction. Internal
+layer analysis reveals the correct answer peaked in blocks
+10--11 before being suppressed by block 12.
 
-\textbf{Type 2b --- Knowledge Gap.}
+\paragraph{Type~2b: Knowledge Gap.}
 The correct answer does not appear in the top-10 predictions.
-The relevant fact was not encoded during training.
+The relevant fact was not encoded during pretraining.
 
 % ── 4. Experiments ────────────────────────────────────────────────
 \section{Experiments}
@@ -228,42 +231,53 @@ The relevant fact was not encoded during training.
 \subsection{Experiment 1: Relation Dropout in Small Models}
 
 We test our 806K-parameter model on 6 capital-city prompts
-and measure average attention to the relation token
-``capital'' in the final transformer block across all heads.
-Results are shown in Table~\ref{tab:relation_dropout} and
-visualised in Figure~\ref{fig:relation_dropout}.
+of the form ``The capital of [country] is'' and measure
+average attention to the relation token ``capital'' in the
+final transformer block across all heads. Results are shown
+in Table~\ref{tab:relation_dropout} and visualised in
+Figure~\ref{fig:relation_dropout}.
 
 \subsection{Experiment 2: GPT-2 Validation}
 
 We test GPT-2 on 35 factual prompts across 5 categories
 (capitals, inventors, authors, science, history) and classify
-each prediction using our taxonomy (Table~\ref{tab:gpt2}).
+each prediction using our taxonomy from
+Section~\ref{sec:taxonomy}. Results are shown in
+Table~\ref{tab:gpt2}.
 
 \subsection{Experiment 3: Layer-by-Layer Suppression Analysis}
 
-For 4 prompts exhibiting Type 2a behaviour, we project the
+For 4 prompts exhibiting Type~2a behaviour, we project the
 hidden state at each of GPT-2's 12 transformer blocks to
-vocabulary space, revealing per-layer probability curves for
-both the correct answer and the competing token
-(Figure~\ref{fig:layer_suppression}, Table~\ref{tab:layers}).
+vocabulary space, producing per-layer probability curves for
+both the correct answer and the competing token. Results are
+shown in Figure~\ref{fig:layer_suppression} and
+Table~\ref{tab:layers}.
 
 \subsection{Experiment 4: Large-Scale GPU Validation}
 
 Using an NVIDIA RTX 4060 Laptop GPU, we run 20,000 factual
-prompts through GPT-2 at 47 prompts/second (7.1 minutes total)
-across 7 knowledge categories. Results are summarised in
+prompts through GPT-2 at 47 prompts per second (7.1 minutes
+total) across 7 knowledge categories. Prompts are generated
+from 50 country-capital pairs with 3 phrasing variants each,
+15 scientist-discovery pairs, 10 historical dates, 10 science
+facts, and 10 author-work pairs. Results are summarised in
 Table~\ref{tab:largescale} and Figure~\ref{fig:taxonomy}.
 
 % ── 5. Results ────────────────────────────────────────────────────
 \section{Results}
 
-\subsection{Relation Dropout}
+\subsection{Relation Dropout (Experiment 1)}
+
+Table~\ref{tab:relation_dropout} shows the relation attention
+scores and outcomes for our small model.
 
 \begin{table}[H]
 \centering
 \caption{Relation Dropout in our 806K-parameter model.
-Relation attention $< 0.05$ in the final block correlates
-with hallucination in 5 of 6 cases.}
+Relation attention below 0.05 in the final block correlates
+with hallucination in 5 of 6 cases. The single correct
+prediction maintains relation attention above 0.08.}
 \label{tab:relation_dropout}
 \begin{tabular}{lccc}
 \toprule
@@ -282,32 +296,32 @@ with hallucination in 5 of 6 cases.}
 
 Figure~\ref{fig:relation_dropout} shows the full attention
 heatmap for a hallucination case versus a correct prediction.
-The contrast is stark: in the hallucination case (left panel),
+The contrast is clear. In the hallucination case (left panel),
 attention to ``capital'' in the final block collapses to
-values between 0.007 and 0.012 across all four heads. In the
-correct case (right panel), attention is maintained at
-0.076--0.139. The model that answers correctly has not
+values between 0.007 and 0.012 across all four heads.
+In the correct case (right panel), attention is maintained
+at 0.076--0.139. The model that answers correctly has not
 forgotten what kind of question it is being asked.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{figure2_relation_dropout.png}
 \caption{Attention to the relation token ``capital'' across
-all blocks and heads. Left: hallucination case --- final
+all blocks and heads. Left: hallucination case, where final
 block attention collapses (highlighted box). Right: correct
-case --- attention maintained throughout. The divergence
+case, where attention is maintained throughout. The divergence
 in the final block is the Relation Dropout signature.}
 \label{fig:relation_dropout}
 \end{figure}
 
-\subsection{Last-Layer Suppression}
+\subsection{Last-Layer Suppression (Experiment 3)}
 
 Figure~\ref{fig:layer_suppression} reveals the most striking
 finding of this paper. For every hallucination prompt tested,
 the probability of the correct answer follows the same
 trajectory: near-zero through blocks 1--9, a sharp surge in
-blocks 10--11, then a cliff-edge collapse at block 12 as
-the structural token ``the'' takes over.
+blocks 10--11, then a cliff-edge collapse at block 12 as the
+structural token ``the'' takes over.
 
 \begin{figure}[H]
 \centering
@@ -318,15 +332,15 @@ The green shaded region (blocks 10--11) marks factual
 emergence; the red region (block 12) marks suppression.
 The Berlin Wall case (bottom right) survives because its
 factual signal exceeds the suppressor token probability
-at block 12 --- illustrating the survival threshold.}
+at block 12, illustrating the survival threshold.}
 \label{fig:layer_suppression}
 \end{figure}
 
 \begin{table}[H]
 \centering
-\caption{Peak factual layer and suppression layer for 4 prompts.
-Block 12 suppresses in every case. Average peak: 10.5.
-Average suppression: 12.0.}
+\caption{Peak factual layer and suppression layer for 4
+prompts. Block 12 suppresses in every case.
+Average peak layer: 10.5. Average suppression layer: 12.0.}
 \label{tab:layers}
 \begin{tabular}{lccc}
 \toprule
@@ -344,22 +358,22 @@ The Berlin Wall fell in      & Block 10 & 0.128 & Block 12 \\
 \end{tabular}
 \end{table}
 
-The Berlin Wall case is instructive. Block 12 suppresses the
-``1989'' signal from 0.128 to 0.0002 --- a 640-fold reduction.
-Yet ``1989'' remains the top prediction because ``the'' only
-reaches 0.045. This defines a \emph{survival threshold}: a
-factual signal strong enough to resist block 12 interference.
-Facts appearing frequently in training survive; rare facts
-do not.
+The Berlin Wall case is instructive. Block 12 suppresses
+the ``1989'' signal from 0.128 to 0.0002, a 640-fold
+reduction. Yet ``1989'' remains the top prediction because
+``the'' only reaches 0.045. This defines a
+\emph{survival threshold}: a factual signal strong enough
+to resist block 12 interference. Facts appearing frequently
+in training survive; rare facts do not.
 
-\subsection{GPT-2 Validation}
+\subsection{GPT-2 Validation (Experiment 2)}
 
 \begin{table}[H]
 \centering
 \caption{GPT-2 hallucination taxonomy across 5 categories
-(35 prompts). Zero Type 1 cases: GPT-2 never shows Relation
-Dropout, suggesting this phenomenon is specific to small,
-undertrained models.}
+(35 prompts). Zero Type~1 cases are observed: GPT-2 never
+shows Relation Dropout, suggesting this phenomenon is
+specific to small, undertrained models.}
 \label{tab:gpt2}
 \begin{tabular}{lcccc}
 \toprule
@@ -378,13 +392,13 @@ History    & 1/5  & 0 & 1  & 3 \\
 \end{tabular}
 \end{table}
 
-The absence of Type 1 errors in GPT-2 is itself informative.
+The absence of Type~1 errors in GPT-2 is itself informative.
 At 124M parameters trained on 40GB of text, GPT-2 has
 sufficient capacity to maintain attention to relation tokens.
-Its failures are not attentional --- they are suppressive.
+Its failures are not attentional. They are suppressive.
 The model finds the fact and loses it at the final step.
 
-\subsection{Large-Scale Validation}
+\subsection{Large-Scale Validation (Experiment 4)}
 
 \begin{table}[H]
 \centering
@@ -397,9 +411,9 @@ Average suppression layer: 12.0.}
 \textbf{Type} & \textbf{Count} & \textbf{\%} \\
 \midrule
 Correct                 &    954 &  4.8\% \\
-Type 1 --- Dropout      &  2,946 & 14.7\% \\
-Type 2a --- Suppression &  2,481 & 12.4\% \\
-Type 2b --- Gap         & 13,619 & 68.1\% \\
+Type~1 (Dropout)        &  2,946 & 14.7\% \\
+Type~2a (Suppression)   &  2,481 & 12.4\% \\
+Type~2b (Gap)           & 13,619 & 68.1\% \\
 \midrule
 \textbf{Total}          & \textbf{20,000} & \textbf{100\%} \\
 \bottomrule
@@ -413,15 +427,15 @@ Type 2b --- Gap         & 13,619 & 68.1\% \\
 20,000 prompts. Knowledge Gap (68.1\%) dominates, reflecting
 the limits of GPT-2's training corpus. Right: accuracy by
 knowledge category. History achieves 30\% accuracy while
-authors achieves 0\% --- and alternative phrasings of the
-same factual query drop capital accuracy from 8.1\% to 0\%,
+authors achieves 0\%. Alternative phrasings of the same
+factual query drop capital accuracy from 8.1\% to 0\%,
 illustrating extreme prompt sensitivity.}
 \label{fig:taxonomy}
 \end{figure}
 
 The scale validation confirms both named phenomena.
 The average suppression layer across 20,000 prompts is
-\textbf{exactly 12.0} --- block 12 suppresses in every
+\textbf{exactly 12.0}: block 12 suppresses in every
 measurable case. The average peak factual layer is
 \textbf{11.1}, consistent with our targeted analysis.
 
@@ -430,7 +444,7 @@ The prompt ``The capital of France is'' achieves 8.1\%
 accuracy on capital queries. The prompt ``France's capital
 city is'' achieves 0.0\% on identical facts. The model has
 not learned that Paris is the capital of France in any
-abstract sense --- it has learned that the token sequence
+abstract sense. It has learned that the token sequence
 ``The capital of [country] is'' sometimes precedes a city
 name. This surface-form dependency is a fundamental
 limitation of next-token prediction as a mechanism for
@@ -444,43 +458,44 @@ Relation Dropout and Last-Layer Suppression represent
 fundamentally different failure mechanisms, yet both produce
 the same observable output: a confident wrong answer.
 This has important implications for output-level hallucination
-detection --- confidence scores alone cannot distinguish
-between a model that never found the fact (Type 1) and a model
-that found it then lost it (Type 2a). Internal activation
-analysis is necessary to distinguish these cases.
+detection. Confidence scores alone cannot distinguish between
+a model that never found the fact (Type~1) and a model that
+found it then lost it (Type~2a). Internal activation analysis
+is necessary to distinguish these cases.
 
 \paragraph{The survival threshold.}
 Our results suggest a frequency-based survival threshold:
 facts that appear with sufficient frequency in training data
 generate factual signals strong enough to survive block 12
 suppression. ``The Berlin Wall fell in 1989'' and ``Water
-is made of hydrogen and oxygen'' both survive. ``The capital
-of Australia is Canberra'' does not. This implies that
-hallucination rate is partially predictable from training
-data statistics, independent of model architecture.
+is made of hydrogen and oxygen'' both survive.
+``The capital of Australia is Canberra'' does not. This
+implies that hallucination rate is partially predictable
+from training data statistics, independent of model
+architecture.
 
 \paragraph{Block 12 as a structural bottleneck.}
 The consistency of block 12 as the suppression layer across
-all tested prompts and both Type 2a cases suggests it may
-function as a structural pattern completion layer ---
-one that has learned the syntactic form of the output
-regardless of factual content. Targeted interventions at
-block 12 (e.g., activation patching or fine-tuning with
-factual emphasis) may offer a direct path to reducing
-Last-Layer Suppression.
+all tested prompts suggests it may function as a structural
+pattern completion layer, one that has learned the syntactic
+form of the output regardless of factual content.
+Targeted interventions at block 12, such as activation
+patching or fine-tuning with factual emphasis, may offer
+a direct path to reducing Last-Layer Suppression.
 
 \paragraph{Implications for HallScan.}
 HallScan operationalises our taxonomy as a practical
-detection tool. By measuring relation attention in the
-final block and tracking peak factual layer, HallScan
-classifies hallucination risk without requiring access
-to the correct answer --- a key advantage for deployment
+detection tool. By measuring relation attention in the final
+block and tracking the peak factual layer, HallScan
+classifies hallucination risk without requiring access to
+the correct answer. This is a key advantage for deployment
 in settings where ground truth is unavailable.
 
 % ── 7. Limitations ────────────────────────────────────────────────
 \section{Limitations}
 
-Our study has several limitations that future work should address.
+Our study has several limitations that future work should
+address.
 
 First, the Relation Dropout threshold $\tau = 0.05$ was
 determined empirically on a small number of prompts and may
@@ -496,16 +511,16 @@ independent prompt set spanning diverse knowledge domains.
 
 Third, we test only GPT-2 at production scale. Whether
 Last-Layer Suppression occurs in larger models (GPT-3,
-LLaMA, Claude) --- and at which layer --- remains an open
-question. The phenomenon may manifest at different depths
-in models with more blocks.
+LLaMA, Claude) and at which layer remains an open question.
+The phenomenon may manifest at different depths in models
+with more blocks.
 
 Fourth, our taxonomy is based on observable output behaviour
 and attention patterns. Deeper causal analysis using
 activation patching \citep{elhage2021mathematical} would
 allow us to establish whether block 12 suppression is
-causally responsible for Type 2a hallucinations, rather
-than merely correlated.
+causally responsible for Type~2a hallucinations, rather
+than merely correlated with them.
 
 % ── 8. Conclusion ─────────────────────────────────────────────────
 \section{Conclusion}
@@ -515,22 +530,24 @@ that two consistent, measurable patterns precede hallucinations
 in the internal activations of transformer models: Relation
 Dropout in small models, and Last-Layer Suppression in GPT-2.
 Both patterns are detectable before the incorrect token is
-generated --- suggesting that hallucination is not an
-inevitable property of next-token prediction, but a specific
-failure mode with identifiable internal signatures.
+generated, suggesting that hallucination is not an inevitable
+property of next-token prediction, but a specific failure
+mode with identifiable internal signatures.
 
 The most striking result of this paper is the consistency
 of block 12 suppression. Across 20,000 prompts, the average
 suppression layer is exactly 12.0. The model finds the
-answer. Then one layer erases it. Understanding why ---
-and intervening --- is the work this paper sets in motion.
+answer. Then one layer erases it. Understanding why, and
+intervening, is the work this paper sets in motion.
 
-Code, data, and models are available at:\\
+\bigskip
+\noindent Code, data, and models are available at:
 \url{https://github.com/TrazeMaG/hallucination-fingerprints}
 
 \noindent HallScan: \texttt{pip install hallscan}
 
-\noindent HallBench: \url{https://huggingface.co/datasets/Trazemag/hallbench}
+\noindent HallBench:
+\url{https://huggingface.co/datasets/Trazemag/hallbench}
 
 % ── References ────────────────────────────────────────────────────
 \bibliographystyle{plainnat}
@@ -540,48 +557,57 @@ Code, data, and models are available at:\\
 \bibitem[Brown et al.(2020)]{brown2020language}
 Brown, T., Mann, B., Ryder, N., et al. (2020).
 Language models are few-shot learners.
-\emph{Advances in Neural Information Processing Systems}, 33.
+\emph{Advances in Neural Information Processing Systems}, 33,
+1877--1901.
 
 \bibitem[Elhage et al.(2021)]{elhage2021mathematical}
 Elhage, N., Nanda, N., Olsson, C., et al. (2021).
 A mathematical framework for transformer circuits.
 \emph{Transformer Circuits Thread}.
+\url{https://transformer-circuits.pub/2021/framework/index.html}
 
 \bibitem[Geva et al.(2021)]{geva2021transformer}
 Geva, M., Schuster, R., Berant, J., \& Levy, O. (2021).
 Transformer feed-forward layers are key-value memories.
-\emph{EMNLP 2021}.
+In \emph{Proceedings of EMNLP 2021}, 5484--5495.
 
 \bibitem[Ji et al.(2023)]{ji2023survey}
 Ji, Z., Lee, N., Frieske, R., et al. (2023).
 Survey of hallucination in natural language generation.
-\emph{ACM Computing Surveys}, 55(12).
+\emph{ACM Computing Surveys}, 55(12), 1--38.
 
 \bibitem[Kadavath et al.(2022)]{kadavath2022language}
 Kadavath, S., Conerly, T., Askell, A., et al. (2022).
 Language models (mostly) know what they know.
-\emph{arXiv:2207.05221}.
+\emph{arXiv preprint arXiv:2207.05221}.
+
+\bibitem[Kingma \& Ba(2015)]{kingma2014adam}
+Kingma, D. P., \& Ba, J. (2015).
+Adam: A method for stochastic optimization.
+In \emph{Proceedings of ICLR 2015}.
 
 \bibitem[Lin et al.(2022)]{lin2022truthfulqa}
 Lin, S., Hilton, J., \& Evans, O. (2022).
 TruthfulQA: Measuring how models mimic human falsehoods.
-\emph{ACL 2022}.
+In \emph{Proceedings of ACL 2022}, 3214--3252.
 
 \bibitem[Mielke et al.(2022)]{mielke2022reducing}
 Mielke, S. J., Szlam, A., Dinan, E., \& Boureau, Y. L. (2022).
-Reducing conversational agents' overconfidence
-through linguistic calibration.
-\emph{TACL}, 10.
+Reducing conversational agents' overconfidence through
+linguistic calibration.
+\emph{Transactions of the Association for Computational
+Linguistics}, 10, 857--872.
 
 \bibitem[Olsson et al.(2022)]{olsson2022context}
 Olsson, C., Elhage, N., Nanda, N., et al. (2022).
 In-context learning and induction heads.
 \emph{Transformer Circuits Thread}.
+\url{https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html}
 
 \bibitem[Radford et al.(2019)]{radford2019language}
 Radford, A., Wu, J., Child, R., et al. (2019).
 Language models are unsupervised multitask learners.
-\emph{OpenAI Blog}.
+\emph{OpenAI Blog}, 1(8), 9.
 
 \end{thebibliography}
 

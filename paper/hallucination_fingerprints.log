@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.4.28)  29 APR 2026 00:32
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.4.28)  30 APR 2026 12:37
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -424,7 +424,7 @@ Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \@float@everytoks=\toks29
 \@floatcapt=\box60
 )
-Package hyperref Info: Option `colorlinks' set `true' on input line 23.
+Package hyperref Info: Option `colorlinks' set `true' on input line 24.
 
 (C:\Program Files\MiKTeX\tex/latex/l3backend\l3backend-pdftex.def
 File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
@@ -433,24 +433,24 @@ File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
 (hallucination_fingerprints.aux)
 \openout1 = `hallucination_fingerprints.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 34.
-LaTeX Font Info:    ... okay on input line 34.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 34.
-LaTeX Font Info:    ... okay on input line 34.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 34.
-LaTeX Font Info:    ... okay on input line 34.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 34.
-LaTeX Font Info:    ... okay on input line 34.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 34.
-LaTeX Font Info:    ... okay on input line 34.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 34.
-LaTeX Font Info:    ... okay on input line 34.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 34.
-LaTeX Font Info:    ... okay on input line 34.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 34.
-LaTeX Font Info:    ... okay on input line 34.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 34.
-LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 35.
+LaTeX Font Info:    ... okay on input line 35.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -507,20 +507,20 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 (C:\Program Files\MiKTeX\tex/latex/00miktex\epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
-Package hyperref Info: Link coloring ON on input line 34.
+Package hyperref Info: Link coloring ON on input line 35.
 
 (hallucination_fingerprints.out) (hallucination_fingerprints.out)
 \@outlinefile=\write3
 \openout3 = `hallucination_fingerprints.out'.
 
 \c@lstlisting=\count336
-LaTeX Info: Redefining \microtypecontext on input line 34.
-Package microtype Info: Applying patch `item' on input line 34.
-Package microtype Info: Applying patch `toc' on input line 34.
-Package microtype Info: Applying patch `eqnum' on input line 34.
-Package microtype Info: Applying patch `footnote' on input line 34.
-Package microtype Info: Applying patch `verbatim' on input line 34.
-LaTeX Info: Redefining \microtypesetup on input line 34.
+LaTeX Info: Redefining \microtypecontext on input line 35.
+Package microtype Info: Applying patch `item' on input line 35.
+Package microtype Info: Applying patch `toc' on input line 35.
+Package microtype Info: Applying patch `eqnum' on input line 35.
+Package microtype Info: Applying patch `footnote' on input line 35.
+Package microtype Info: Applying patch `verbatim' on input line 35.
+LaTeX Info: Redefining \microtypesetup on input line 35.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
@@ -536,7 +536,7 @@ Package microtype Info: No adjustment of character kerning.
 File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
 (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msa on input line 35.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 36.
 
 
 (C:\Program Files\MiKTeX\tex/latex/amsfonts\umsa.fd
@@ -545,7 +545,7 @@ File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 (C:\Users\TrazeMaG\AppData\Roaming\MiKTeX\tex/latex/microtype\mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 35.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 36.
 
 
 (C:\Program Files\MiKTeX\tex/latex/amsfonts\umsb.fd
@@ -558,81 +558,101 @@ File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 
 {C:/Users/TrazeMaG/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}]
 [2] [3]
-<figure2_relation_dropout.png, id=141, 984.7992pt x 357.2547pt>
+<figure2_relation_dropout.png, id=144, 984.7992pt x 357.2547pt>
 File: figure2_relation_dropout.png Graphic file (type png)
 <use figure2_relation_dropout.png>
-Package pdftex.def Info: figure2_relation_dropout.png  used on input line 294.
+Package pdftex.def Info: figure2_relation_dropout.png  used on input line 308.
 (pdftex.def)             Requested size: 452.9679pt x 164.32278pt.
-<figure1_layer_suppression.png, id=144, 998.0487pt x 703.1871pt>
-File: figure1_layer_suppression.png Graphic file (type png)
-<use figure1_layer_suppression.png>
-Package pdftex.def Info: figure1_layer_suppression.png  used on input line 314.
-
-(pdftex.def)             Requested size: 452.9679pt x 319.1459pt.
  [4
 pdfTeX warning (ext4): destination with the same identifier (name{table.1}) has
  been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.324 
-      
+l.316 
+      ]
+<figure1_layer_suppression.png, id=155, 998.0487pt x 703.1871pt>
+File: figure1_layer_suppression.png Graphic file (type png)
+<use figure1_layer_suppression.png>
+Package pdftex.def Info: figure1_layer_suppression.png  used on input line 328.
+
+(pdftex.def)             Requested size: 452.9679pt x 319.1459pt.
+ [5
 pdfTeX warning (ext4): destination with the same identifier (name{figure.1}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.324 
-       <./figure2_relation_dropout.png>] [5
+l.338 
+       <./figure2_relation_dropout.png>] [6
 pdfTeX warning (ext4): destination with the same identifier (name{figure.2}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.380 
+l.394 
       
 pdfTeX warning (ext4): destination with the same identifier (name{table.2}) has
  been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.380 
+l.394 
        <./figure1_layer_suppression.png>]
-<figure3_taxonomy_results.png, id=157, 934.692pt x 421.0932pt>
+<figure3_taxonomy_results.png, id=166, 934.692pt x 421.0932pt>
 File: figure3_taxonomy_results.png Graphic file (type png)
 <use figure3_taxonomy_results.png>
-Package pdftex.def Info: figure3_taxonomy_results.png  used on input line 411.
+Package pdftex.def Info: figure3_taxonomy_results.png  used on input line 425.
 (pdftex.def)             Requested size: 452.9679pt x 204.06932pt.
- [6
+ [7
 pdfTeX warning (ext4): destination with the same identifier (name{table.3}) has
  been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.421 
+l.435 
       
 pdfTeX warning (ext4): destination with the same identifier (name{table.4}) has
  been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.421 
-      ] [7
+l.435 
+      ] [8
 pdfTeX warning (ext4): destination with the same identifier (name{figure.3}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.471 
-       <./figure3_taxonomy_results.png>] [8] [9]
-(hallucination_fingerprints.aux)
+l.485 
+       <./figure3_taxonomy_results.png>]
+Overfull \hbox (45.50879pt too wide) in paragraph at lines 544--546
+\OT1/cmr/m/n/10.95 (-20) Code, data, and mod-els are avail-able at: [][]$\OT1/c
+mtt/m/n/10.95 https : / / github . com / TrazeMaG / hallucination-[]fingerprint
+s$[][] 
+ []
+
+[9]
+Underfull \hbox (badness 2111) in paragraph at lines 602--606
+[]\OT1/cmr/m/n/10.95 (+20) Olsson, C., El-hage, N., Nanda, N., et al. (2022). I
+n-context learn-ing and in-duc-
+ []
+
+
+Underfull \hbox (badness 1107) in paragraph at lines 602--606
+\OT1/cmr/m/n/10.95 (+20) tion heads. \OT1/cmr/m/it/10.95 (+20) Trans-former Cir
+-cuits Thread\OT1/cmr/m/n/10.95 (+20) . [][]$\OT1/cmtt/m/n/10.95 https : / / tr
+ansformer-[]circuits . pub / 2022 /
+ []
+
+[10] (hallucination_fingerprints.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
 Package rerunfilecheck Info: File `hallucination_fingerprints.out' has not chan
 ged.
-(rerunfilecheck)             Checksum: A2499F7FEAE3CA9E103179BB75115C59;2931.
+(rerunfilecheck)             Checksum: 88701854C4B173CC4D59A31B390D8227;3279.
  ) 
 Here is how much of TeX's memory you used:
- 15136 strings out of 467871
- 230910 string characters out of 5428434
- 700039 words of memory out of 5000000
- 43631 multiletter control sequences out of 15000+600000
- 642225 words of font info for 158 fonts, out of 8000000 for 9000
+ 15128 strings out of 467871
+ 230914 string characters out of 5428434
+ 700221 words of memory out of 5000000
+ 43635 multiletter control sequences out of 15000+600000
+ 641908 words of font info for 151 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  75i,8n,79p,1217b,567s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\TrazeMaG\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\t
@@ -646,9 +666,9 @@ b><C:/Program Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Program
  Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Program Files/MiKTe
 X/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:/Program Files/MiKTeX/fonts/type
 1/public/amsfonts/cm/cmtt12.pfb>
-Output written on hallucination_fingerprints.pdf (9 pages, 1228138 bytes).
+Output written on hallucination_fingerprints.pdf (10 pages, 1233422 bytes).
 PDF statistics:
- 245 PDF objects out of 1000 (max. 8388607)
- 48 named destinations out of 1000 (max. 500000)
+ 259 PDF objects out of 1000 (max. 8388607)
+ 50 named destinations out of 1000 (max. 500000)
  32424 words of extra memory for PDF output out of 35830 (max. 10000000)
 

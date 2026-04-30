@@ -10,7 +10,7 @@
 \citation{elhage2021mathematical}
 \citation{olsson2022context}
 \citation{geva2021transformer}
-\citation{radford2019language}
+\citation{kingma2014adam}
 \@writefile{toc}{\contentsline {section}{\numberline {2}Related Work}{2}{section.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Hallucination in NLG.}{2}{section.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Factuality and calibration.}{2}{section.2}\protected@file@percent }
@@ -18,48 +18,56 @@
 \@writefile{toc}{\contentsline {paragraph}{Knowledge in FFN layers.}{2}{section.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {3}Method}{2}{section.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Models}{2}{subsection.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Custom transformer (806K parameters).}{2}{subsection.3.1}\protected@file@percent }
+\citation{radford2019language}
+\@writefile{toc}{\contentsline {paragraph}{GPT-2 (124M parameters).}{3}{subsection.3.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Internal Activation Capture}{3}{subsection.3.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Hallucination Taxonomy}{3}{subsection.3.3}\protected@file@percent }
+\newlabel{sec:taxonomy}{{3.3}{3}{Hallucination Taxonomy}{subsection.3.3}{}}
+\@writefile{toc}{\contentsline {paragraph}{Type~1: Relation Dropout.}{3}{subsection.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Type~2a: Last-Layer Suppression.}{3}{subsection.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Type~2b: Knowledge Gap.}{3}{subsection.3.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {4}Experiments}{3}{section.4}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Experiment 1: Relation Dropout in Small Models}{3}{subsection.4.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Experiment 2: GPT-2 Validation}{3}{subsection.4.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Experiment 3: Layer-by-Layer Suppression Analysis}{3}{subsection.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Experiment 3: Layer-by-Layer Suppression Analysis}{4}{subsection.4.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Experiment 4: Large-Scale GPU Validation}{4}{subsection.4.4}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {5}Results}{4}{section.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Relation Dropout}{4}{subsection.5.1}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Relation Dropout in our 806K-parameter model. Relation attention $< 0.05$ in the final block correlates with hallucination in 5 of 6 cases.}}{4}{table.1}\protected@file@percent }
-\newlabel{tab:relation_dropout}{{1}{4}{Relation Dropout in our 806K-parameter model. Relation attention $< 0.05$ in the final block correlates with hallucination in 5 of 6 cases}{table.1}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Attention to the relation token ``capital'' across all blocks and heads. Left: hallucination case --- final block attention collapses (highlighted box). Right: correct case --- attention maintained throughout. The divergence in the final block is the Relation Dropout signature.}}{4}{figure.1}\protected@file@percent }
-\newlabel{fig:relation_dropout}{{1}{4}{Attention to the relation token ``capital'' across all blocks and heads. Left: hallucination case --- final block attention collapses (highlighted box). Right: correct case --- attention maintained throughout. The divergence in the final block is the Relation Dropout signature}{figure.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Last-Layer Suppression}{4}{subsection.5.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Per-layer probability of the correct answer versus the winning incorrect token across GPT-2's 12 blocks. The green shaded region (blocks 10--11) marks factual emergence; the red region (block 12) marks suppression. The Berlin Wall case (bottom right) survives because its factual signal exceeds the suppressor token probability at block 12 --- illustrating the survival threshold.}}{5}{figure.2}\protected@file@percent }
-\newlabel{fig:layer_suppression}{{2}{5}{Per-layer probability of the correct answer versus the winning incorrect token across GPT-2's 12 blocks. The green shaded region (blocks 10--11) marks factual emergence; the red region (block 12) marks suppression. The Berlin Wall case (bottom right) survives because its factual signal exceeds the suppressor token probability at block 12 --- illustrating the survival threshold}{figure.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Peak factual layer and suppression layer for 4 prompts. Block 12 suppresses in every case. Average peak: 10.5. Average suppression: 12.0.}}{5}{table.2}\protected@file@percent }
-\newlabel{tab:layers}{{2}{5}{Peak factual layer and suppression layer for 4 prompts. Block 12 suppresses in every case. Average peak: 10.5. Average suppression: 12.0}{table.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}GPT-2 Validation}{6}{subsection.5.3}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces GPT-2 hallucination taxonomy across 5 categories (35 prompts). Zero Type 1 cases: GPT-2 never shows Relation Dropout, suggesting this phenomenon is specific to small, undertrained models.}}{6}{table.3}\protected@file@percent }
-\newlabel{tab:gpt2}{{3}{6}{GPT-2 hallucination taxonomy across 5 categories (35 prompts). Zero Type 1 cases: GPT-2 never shows Relation Dropout, suggesting this phenomenon is specific to small, undertrained models}{table.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Large-Scale Validation}{6}{subsection.5.4}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Hallucination type distribution across 20,000 prompts on GPT-2. Average peak factual layer: 11.1. Average suppression layer: 12.0.}}{6}{table.4}\protected@file@percent }
-\newlabel{tab:largescale}{{4}{6}{Hallucination type distribution across 20,000 prompts on GPT-2. Average peak factual layer: 11.1. Average suppression layer: 12.0}{table.4}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Left: distribution of hallucination types across 20,000 prompts. Knowledge Gap (68.1\%) dominates, reflecting the limits of GPT-2's training corpus. Right: accuracy by knowledge category. History achieves 30\% accuracy while authors achieves 0\% --- and alternative phrasings of the same factual query drop capital accuracy from 8.1\% to 0\%, illustrating extreme prompt sensitivity.}}{7}{figure.3}\protected@file@percent }
-\newlabel{fig:taxonomy}{{3}{7}{Left: distribution of hallucination types across 20,000 prompts. Knowledge Gap (68.1\%) dominates, reflecting the limits of GPT-2's training corpus. Right: accuracy by knowledge category. History achieves 30\% accuracy while authors achieves 0\% --- and alternative phrasings of the same factual query drop capital accuracy from 8.1\% to 0\%, illustrating extreme prompt sensitivity}{figure.3}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Discussion}{7}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Two failure modes, one confidence.}{7}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{The survival threshold.}{7}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Relation Dropout (Experiment 1)}{4}{subsection.5.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Relation Dropout in our 806K-parameter model. Relation attention below 0.05 in the final block correlates with hallucination in 5 of 6 cases. The single correct prediction maintains relation attention above 0.08.}}{4}{table.1}\protected@file@percent }
+\newlabel{tab:relation_dropout}{{1}{4}{Relation Dropout in our 806K-parameter model. Relation attention below 0.05 in the final block correlates with hallucination in 5 of 6 cases. The single correct prediction maintains relation attention above 0.08}{table.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Attention to the relation token ``capital'' across all blocks and heads. Left: hallucination case, where final block attention collapses (highlighted box). Right: correct case, where attention is maintained throughout. The divergence in the final block is the Relation Dropout signature.}}{5}{figure.1}\protected@file@percent }
+\newlabel{fig:relation_dropout}{{1}{5}{Attention to the relation token ``capital'' across all blocks and heads. Left: hallucination case, where final block attention collapses (highlighted box). Right: correct case, where attention is maintained throughout. The divergence in the final block is the Relation Dropout signature}{figure.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Last-Layer Suppression (Experiment 3)}{5}{subsection.5.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Per-layer probability of the correct answer versus the winning incorrect token across GPT-2's 12 blocks. The green shaded region (blocks 10--11) marks factual emergence; the red region (block 12) marks suppression. The Berlin Wall case (bottom right) survives because its factual signal exceeds the suppressor token probability at block 12, illustrating the survival threshold.}}{6}{figure.2}\protected@file@percent }
+\newlabel{fig:layer_suppression}{{2}{6}{Per-layer probability of the correct answer versus the winning incorrect token across GPT-2's 12 blocks. The green shaded region (blocks 10--11) marks factual emergence; the red region (block 12) marks suppression. The Berlin Wall case (bottom right) survives because its factual signal exceeds the suppressor token probability at block 12, illustrating the survival threshold}{figure.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Peak factual layer and suppression layer for 4 prompts. Block 12 suppresses in every case. Average peak layer: 10.5. Average suppression layer: 12.0.}}{6}{table.2}\protected@file@percent }
+\newlabel{tab:layers}{{2}{6}{Peak factual layer and suppression layer for 4 prompts. Block 12 suppresses in every case. Average peak layer: 10.5. Average suppression layer: 12.0}{table.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}GPT-2 Validation (Experiment 2)}{7}{subsection.5.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces GPT-2 hallucination taxonomy across 5 categories (35 prompts). Zero Type~1 cases are observed: GPT-2 never shows Relation Dropout, suggesting this phenomenon is specific to small, undertrained models.}}{7}{table.3}\protected@file@percent }
+\newlabel{tab:gpt2}{{3}{7}{GPT-2 hallucination taxonomy across 5 categories (35 prompts). Zero Type~1 cases are observed: GPT-2 never shows Relation Dropout, suggesting this phenomenon is specific to small, undertrained models}{table.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Large-Scale Validation (Experiment 4)}{7}{subsection.5.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Hallucination type distribution across 20,000 prompts on GPT-2. Average peak factual layer: 11.1. Average suppression layer: 12.0.}}{7}{table.4}\protected@file@percent }
+\newlabel{tab:largescale}{{4}{7}{Hallucination type distribution across 20,000 prompts on GPT-2. Average peak factual layer: 11.1. Average suppression layer: 12.0}{table.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Left: distribution of hallucination types across 20,000 prompts. Knowledge Gap (68.1\%) dominates, reflecting the limits of GPT-2's training corpus. Right: accuracy by knowledge category. History achieves 30\% accuracy while authors achieves 0\%. Alternative phrasings of the same factual query drop capital accuracy from 8.1\% to 0\%, illustrating extreme prompt sensitivity.}}{8}{figure.3}\protected@file@percent }
+\newlabel{fig:taxonomy}{{3}{8}{Left: distribution of hallucination types across 20,000 prompts. Knowledge Gap (68.1\%) dominates, reflecting the limits of GPT-2's training corpus. Right: accuracy by knowledge category. History achieves 30\% accuracy while authors achieves 0\%. Alternative phrasings of the same factual query drop capital accuracy from 8.1\% to 0\%, illustrating extreme prompt sensitivity}{figure.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Discussion}{8}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Two failure modes, one confidence.}{8}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{The survival threshold.}{8}{section.6}\protected@file@percent }
 \citation{elhage2021mathematical}
 \bibstyle{plainnat}
 \bibcite{brown2020language}{{1}{2020}{{Brown et al.}}{{}}}
-\@writefile{toc}{\contentsline {paragraph}{Block 12 as a structural bottleneck.}{8}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Implications for HallScan.}{8}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {7}Limitations}{8}{section.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{8}{section.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Block 12 as a structural bottleneck.}{9}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Implications for HallScan.}{9}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Limitations}{9}{section.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{9}{section.8}\protected@file@percent }
 \bibcite{elhage2021mathematical}{{2}{2021}{{Elhage et al.}}{{}}}
 \bibcite{geva2021transformer}{{3}{2021}{{Geva et al.}}{{}}}
 \bibcite{ji2023survey}{{4}{2023}{{Ji et al.}}{{}}}
 \bibcite{kadavath2022language}{{5}{2022}{{Kadavath et al.}}{{}}}
-\bibcite{lin2022truthfulqa}{{6}{2022}{{Lin et al.}}{{}}}
-\bibcite{mielke2022reducing}{{7}{2022}{{Mielke et al.}}{{}}}
-\bibcite{olsson2022context}{{8}{2022}{{Olsson et al.}}{{}}}
-\bibcite{radford2019language}{{9}{2019}{{Radford et al.}}{{}}}
-\gdef \@abspage@last{9}
+\bibcite{kingma2014adam}{{6}{2015}{{Kingma \& Ba}}{{}}}
+\bibcite{lin2022truthfulqa}{{7}{2022}{{Lin et al.}}{{}}}
+\bibcite{mielke2022reducing}{{8}{2022}{{Mielke et al.}}{{}}}
+\bibcite{olsson2022context}{{9}{2022}{{Olsson et al.}}{{}}}
+\bibcite{radford2019language}{{10}{2019}{{Radford et al.}}{{}}}
+\gdef \@abspage@last{10}
