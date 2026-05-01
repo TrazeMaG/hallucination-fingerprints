@@ -6,8 +6,7 @@
 **Author:** Nikhil Upadhyay
 **Institution:** Independent Researcher, Dublin, Ireland
 **Preprint:** [doi.org/10.5281/zenodo.19934537](https://doi.org/10.5281/zenodo.19934537)
-**Status:** Published on Zenodo — arXiv submission pending
-**Paper:** `paper/hallucination_fingerprints.pdf`
+**Status:** Published — arXiv submission pending
 
 ---
 
@@ -89,7 +88,7 @@ Average peak factual layer: 11.1 | Average suppression layer: 12.0
 ## Dataset
 
 20,000 labeled hallucination examples on HuggingFace.
-Downloaded 29+ times within 48 hours of release.
+Downloaded 29+ times within 48 hours of release with zero promotion.
 
 ```python
 from datasets import load_dataset
@@ -97,6 +96,20 @@ ds = load_dataset("Trazemag/hallbench")
 ```
 
 [huggingface.co/datasets/Trazemag/hallbench](https://huggingface.co/datasets/Trazemag/hallbench)
+
+---
+
+## Published On
+
+| Platform | Status | Link |
+|----------|--------|------|
+| Zenodo | Published | [doi.org/10.5281/zenodo.19934537](https://doi.org/10.5281/zenodo.19934537) |
+| Academia.edu | Published | [academia.edu](https://www.academia.edu) |
+| OSF MetaArXiv | Published | [osf.io](https://osf.io) |
+| arXiv cs.CL | Endorsement pending | — |
+| GitHub | Live | [TrazeMaG/hallucination-fingerprints](https://github.com/TrazeMaG/hallucination-fingerprints) |
+| PyPI | Live | [pip install hallscan](https://pypi.org/project/hallscan/) |
+| HuggingFace | Live | [Trazemag/hallbench](https://huggingface.co/datasets/Trazemag/hallbench) |
 
 ---
 
@@ -131,6 +144,8 @@ hallucination-fingerprints/
     └── large_scale_results.json
 ```
 
+---
+
 ## Reproduce
 
 ```bash
@@ -157,6 +172,7 @@ python experiments/03_layer_suppression.py
 - [x] Write 10-page academic paper with 3 figures (LaTeX/PDF)
 - [x] Publish preprint on Zenodo (DOI issued)
 - [x] Publish on Academia.edu
+- [x] Publish on OSF MetaArXiv
 - [ ] arXiv submission (cs.CL) — endorsement pending
 
 ---
