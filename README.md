@@ -105,7 +105,6 @@ ds = load_dataset("Trazemag/hallbench")
 |----------|--------|------|
 | Zenodo | Published | [doi.org/10.5281/zenodo.19934537](https://doi.org/10.5281/zenodo.19934537) |
 | Academia.edu | Published | [academia.edu](https://www.academia.edu) |
-| OSF MetaArXiv | Published | [osf.io](https://osf.io) |
 | arXiv cs.CL | Endorsement pending | — |
 | GitHub | Live | [TrazeMaG/hallucination-fingerprints](https://github.com/TrazeMaG/hallucination-fingerprints) |
 | PyPI | Live | [pip install hallscan](https://pypi.org/project/hallscan/) |
