@@ -1,11 +1,12 @@
-Hallucination Fingerprints
+# Hallucination Fingerprints
 
 > Identifying consistent internal activation patterns that precede
 > hallucinations in transformer language models.
 
-**Author:** Nikhil Upadhyay  
+**Author:** Nikhil Upadhyay
 **Institution:** Independent Researcher, Dublin, Ireland
-**Status:** Paper complete — arXiv submission pending  
+**Preprint:** [doi.org/10.5281/zenodo.19934537](https://doi.org/10.5281/zenodo.19934537)
+**Status:** Published on Zenodo — arXiv submission pending
 **Paper:** `paper/hallucination_fingerprints.pdf`
 
 ---
@@ -42,14 +43,14 @@ final block.
 
 | Prompt | Predicted | Correct | Relation Attn | Result |
 |--------|-----------|---------|---------------|--------|
-| the capital of france is | the | paris | 0.037 ⚠️ | ✗ |
-| the capital of germany is | paris | berlin | 0.028 ⚠️ | ✗ |
-| the capital of italy is | in | rome | 0.033 ⚠️ | ✗ |
-| the capital of japan is | the | tokyo | 0.033 ⚠️ | ✗ |
-| the capital of spain is | madrid | madrid | 0.082 ✓ | ✓ |
+| the capital of france is | the | paris | 0.037 | ✗ |
+| the capital of germany is | paris | berlin | 0.028 | ✗ |
+| the capital of italy is | in | rome | 0.033 | ✗ |
+| the capital of japan is | the | tokyo | 0.033 | ✗ |
+| the capital of spain is | madrid | madrid | 0.082 | ✓ |
 
 ### Finding 2 — Last-Layer Suppression
-In GPT-2, factual knowledge emerges strongly in blocks 10–11
+In GPT-2, factual knowledge emerges strongly in blocks 10-11
 then is systematically suppressed by block 12.
 
 | Prompt | Peak Layer | Peak Prob | Suppression |
@@ -57,10 +58,10 @@ then is systematically suppressed by block 12.
 | capital of France is | Block 10 | 0.182 | Block 12 |
 | capital of Germany is | Block 11 | 0.347 | Block 12 |
 | capital of Japan is | Block 11 | 0.461 | Block 12 |
-| Berlin Wall fell in | Block 10 | 0.128 | Block 12 ✓ survived |
+| Berlin Wall fell in | Block 10 | 0.128 | Block 12 (survived) |
 
-Block 12 suppresses in **every single case** across 20,000 prompts.
-Average peak factual layer: **11.1** | Average suppression layer: **12.0**
+Block 12 suppresses in every single case across 20,000 prompts.
+Average peak factual layer: 11.1 | Average suppression layer: 12.0
 
 ---
 
@@ -87,43 +88,48 @@ Average peak factual layer: **11.1** | Average suppression layer: **12.0**
 
 ## Dataset
 
-20,000 labeled hallucination examples on HuggingFace:
+20,000 labeled hallucination examples on HuggingFace.
+Downloaded 29+ times within 48 hours of release.
 
 ```python
 from datasets import load_dataset
 ds = load_dataset("Trazemag/hallbench")
 ```
 
-→ [huggingface.co/datasets/Trazemag/hallbench](https://huggingface.co/datasets/Trazemag/hallbench)
+[huggingface.co/datasets/Trazemag/hallbench](https://huggingface.co/datasets/Trazemag/hallbench)
 
 ---
 
 ## Project Structure
+```
 hallucination-fingerprints/
 ├── src/
-│   ├── transformer.py       # 806K transformer built from scratch
-│   ├── tokenizer.py         # BPE tokenizer
-│   ├── data.py              # Training data pipeline
-│   ├── train.py             # Training loop
-│   ├── fingerprint.py       # Hallucination inspector
-│   ├── gpt2_inspect.py      # GPT-2 validation
-│   ├── large_scale_test.py  # 35-prompt experiment
-│   └── layer_analysis.py    # Layer suppression analysis
+│   ├── transformer.py          # 806K transformer built from scratch
+│   ├── tokenizer.py            # BPE tokenizer
+│   ├── data.py                 # Training data pipeline
+│   ├── train.py                # Training loop
+│   ├── fingerprint.py          # Hallucination inspector
+│   ├── gpt2_inspect.py         # GPT-2 validation
+│   ├── large_scale_test.py     # 35-prompt experiment
+│   └── layer_analysis.py       # Layer suppression analysis
 ├── hallscan/
-│   ├── init.py          # pip install hallscan
-│   ├── scanner.py           # Core detection engine
-│   └── report.py            # Structured results
+│   ├── __init__.py             # pip install hallscan
+│   ├── scanner.py              # Core detection engine
+│   └── report.py               # Structured results
 ├── experiments/
-│   ├── 01_relation_dropout.py    # Table 1
-│   ├── 02_gpt2_validation.py     # Table 2
-│   └── 03_layer_suppression.py   # Figure 1
+│   ├── 01_relation_dropout.py  # Table 1 — reproducible
+│   ├── 02_gpt2_validation.py   # Table 2 — reproducible
+│   └── 03_layer_suppression.py # Figure 1 — reproducible
 ├── paper/
-│   └── hallucination_fingerprints.pdf
-├── large_scale_gpu.py       # 20k GPU experiment
+│   ├── hallucination_fingerprints.pdf
+│   ├── figure1_layer_suppression.png
+│   ├── figure2_relation_dropout.png
+│   └── figure3_taxonomy_results.png
+├── generate_figures.py         # Generates all 3 figures
+├── large_scale_gpu.py          # 20k GPU experiment
 └── results/
-└── large_scale_results.json
-
----
+    └── large_scale_results.json
+```
 
 ## Reproduce
 
@@ -148,8 +154,10 @@ python experiments/03_layer_suppression.py
 - [x] Run 20,000 prompts on RTX 4060 GPU
 - [x] Build HallScan (pip install hallscan)
 - [x] Publish HallBench (20,000 labeled examples)
-- [x] Write 6-page academic paper (LaTeX/PDF)
-- [ ] arXiv submission (cs.CL)
+- [x] Write 10-page academic paper with 3 figures (LaTeX/PDF)
+- [x] Publish preprint on Zenodo (DOI issued)
+- [x] Publish on Academia.edu
+- [ ] arXiv submission (cs.CL) — endorsement pending
 
 ---
 
@@ -157,12 +165,13 @@ python experiments/03_layer_suppression.py
 
 ```bibtex
 @article{upadhyay2026hallucination,
-  title={Hallucination Fingerprints: Consistent Failure Patterns
-         in Large Language Models},
+  title={Hallucination Fingerprints: Consistent Failure
+         Patterns in Large Language Models},
   author={Upadhyay, Nikhil},
-  journal={arXiv preprint},
   year={2026},
-  url={https://github.com/TrazeMaG/hallucination-fingerprints}
+  publisher={Zenodo},
+  doi={10.5281/zenodo.19934537},
+  url={https://doi.org/10.5281/zenodo.19934537}
 }
 ```
 
@@ -170,9 +179,10 @@ python experiments/03_layer_suppression.py
 
 ## Built With
 
-Python · PyTorch · HuggingFace Transformers · NVIDIA RTX 4060  
-Independent research — 7 weeks — Dublin, Ireland
+Python · PyTorch · HuggingFace Transformers · NVIDIA RTX 4060
+Independent research · Dublin, Ireland · April 2026
 
 ---
 
+*Preprint: doi.org/10.5281/zenodo.19934537*
 *arXiv submission pending — cs.CL*
